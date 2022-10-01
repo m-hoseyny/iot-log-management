@@ -1,6 +1,7 @@
 from .crud_user import user
 from .crud_device import device
-from .device_credential import device_credential
+from .crud_device_credential import device_credential
+from .crud_system_log_feed import add_log_to_mongo
 
 # For a new basic set of CRUD operations you could just do
 
