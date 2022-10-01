@@ -37,7 +37,6 @@ def create_device(
     """
     Create new device.
     """
-    print('KHAARR')
     obj = crud.device.get_by_external_id(db, external_id=obj_in.external_id)
     if obj:
         raise HTTPException(
