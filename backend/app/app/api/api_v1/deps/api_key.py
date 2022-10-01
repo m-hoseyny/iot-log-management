@@ -50,22 +50,18 @@ async def api_key_auth(
     db: Session = Depends(get_db)
 ) -> models.DeviceCredential:
     api_key = get_api_key(api_key_query, api_key_header, api_key_cookie)
-    print("API KEY", api_key)
     if len(api_key.split(':')) != 2:
         raise HTTPException(
             status_code=HTTP_406_NOT_ACCEPTABLE, detail="access_token must be xxx:xxx format"
         )
-    device_id_hex, credential_id = api_key.split(':')
-    if not validate_uuid(device_id_hex):
+    credential_id_hex, credentials_value = api_key.split(':')
+    if not validate_uuid(credential_id_hex):
         raise HTTPException(
             status_code=HTTP_406_NOT_ACCEPTABLE, detail="in access_token, XXX:xxx, XXX must be UUID4"
         )
-    device_id = uuid.UUID(device_id_hex)
-    print("Device ID ", device_id)
-    device_credential = crud.device_credential.get_by_id(db=db, id=device_id)
-    print("Device credential: ",device_credential)
-    if device_credential.credentials_id == credential_id:
+    device_credential = crud.device_credential.get_by_id(db=db, id=credential_id_hex)
+    if device_credential and device_credential.credentials_value == credentials_value:
         return device_credential
     raise HTTPException(
-            status_code=HTTP_403_FORBIDDEN, detail="Device credential_id is not valid with device_id"
+            status_code=HTTP_403_FORBIDDEN, detail="access_token is not valid (device_credential_value is not valid)"
         )
