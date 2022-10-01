@@ -1,14 +1,15 @@
-from typing import Optional
+from typing import Optional, Union, List
 import uuid
+from app.schemas.device_credential import DeviceCredentialInDBBase
 from pydantic import BaseModel
 
 
 # Shared properties
 class DeviceBase(BaseModel):
+    id: uuid.UUID
     name: str = None
     type: Optional[str] = 'unknwon'
     label: Optional[str] = 'unknwon'
-    external_id: Optional[uuid.UUID] = uuid.uuid4()
 
 
 # Properties to receive via API on creation
@@ -30,7 +31,7 @@ class DeviceInDBBase(DeviceBase):
 
 # Additional properties to return via API
 class Device(DeviceInDBBase):
-    pass
+    device_credential: Union[List[DeviceCredentialInDBBase], None]
 
 
 # Additional properties stored in DB

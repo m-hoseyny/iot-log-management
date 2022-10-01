@@ -1,11 +1,10 @@
 from typing import TYPE_CHECKING
 import uuid, datetime
 
-from sqlalchemy import Boolean, Column, Integer, String, JSON, UniqueConstraint, DateTime, ForeignKey
+from sqlalchemy import Column, String, JSON, UniqueConstraint, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 
-from app.models.device_profile import DeviceProfile
 from app.db.base_class import Base
 
 
@@ -13,7 +12,7 @@ class Device(Base):
     __tablename__ = 'devices'
     __table_args__ = (
         # this can be db.PrimaryKeyConstraint if you want it to be a primary key
-        UniqueConstraint('tenant_id', 'external_id'),
+        UniqueConstraint('tenant_id', 'id'),
         UniqueConstraint('tenant_id', 'name'),
       )
 
@@ -28,7 +27,6 @@ class Device(Base):
     device_profile_id = Column(UUID(as_uuid=True), ForeignKey('device_profiles.id'), nullable=True, index=True)
     customer_id = Column(UUID(as_uuid=True), default=uuid.uuid4, nullable=True)
     tenant_id = Column(UUID(as_uuid=True), default=uuid.uuid4, nullable=True)
-    external_id = Column(UUID(as_uuid=True), default=uuid.uuid4, nullable=True)
     firmware_id = Column(UUID(as_uuid=True), default=uuid.uuid4, nullable=True)
     software_id = Column(UUID(as_uuid=True), default=uuid.uuid4, nullable=True)
 
@@ -36,7 +34,7 @@ class Device(Base):
     device_credential = relationship("DeviceCredential", back_populates="device")
 
     created_at = Column(DateTime(), default=datetime.datetime.now)
-    updated_at = Column(DateTime(), onupdate=datetime.datetime.now)
+    updated_at = Column(DateTime(), onupdate=datetime.datetime.now, default=datetime.datetime.now)
 
 
 '''

@@ -6,22 +6,34 @@ from app.crud.base import CRUDBase
 from app.models.device import Device
 from app.schemas.device import DeviceCreate, DeviceUpdate
 
+from app.schemas.device_credential import DeviceCredentialInDBBase
+from app.crud import crud_device_credential
+
+import uuid, random, string
+
 
 class CRUDDevice(CRUDBase[Device, DeviceCreate, DeviceUpdate]):
-    def get_by_external_id(self, db: Session, *, external_id: str) -> Optional[Device]:
-        return db.query(Device).filter(Device.external_id == external_id).first()
 
     def create(self, db: Session, *, obj_in: DeviceCreate) -> Device:
         db_obj = Device(
             name=obj_in.name,
             type=obj_in.type,
             label=obj_in.label,
-            external_id=obj_in.external_id,
             customer_id=obj_in.customer_id
         )
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
+        credential_id = uuid.uuid4()
+        dc_obj = DeviceCredentialInDBBase(
+            id=credential_id,
+            credentials_id=credential_id.hex,
+            credentials_type='access_token',
+            credentials_value=''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10)),
+            device_id=db_obj.id
+        )
+        crud_device_credential.device_credential.create(db=db, obj_in=dc_obj)
+        print(db_obj.device_credential)
         return db_obj
 
     def update(

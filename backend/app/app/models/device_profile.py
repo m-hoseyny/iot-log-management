@@ -29,7 +29,6 @@ class DeviceProfile(Base):
     default_dashboard_id = Column(UUID(as_uuid=True), default=uuid.uuid4, nullable=False)
     default_queue_name = Column(String, nullable=True)
     provision_device_key = Column(String, nullable=True)
-    external_id = Column(UUID(as_uuid=True), default=uuid.uuid4, nullable=False)
 
     device = relationship("Device", back_populates="device_profile")
 
