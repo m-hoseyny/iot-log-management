@@ -2,7 +2,7 @@
 from typing import TYPE_CHECKING
 import uuid, datetime
 
-from sqlalchemy import Boolean, Column, Integer, String, JSON, UniqueConstraint, DateTime, Text, ForeignKey
+from sqlalchemy import Column, String, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -16,16 +16,19 @@ class DeviceCredential(Base):
     #     UniqueConstraint('provision_device_key'),
     #   )
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    credentials_id = Column(String, nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True)
+    credentials_id = Column(String, nullable=False, index=True)
     credentials_type = Column(String, nullable=False)
-    credentials_value = Column(String, nullable=True)
+    credentials_value = Column(String, nullable=False, index=True)
     device_id = Column(UUID(as_uuid=True), ForeignKey('devices.id'), default=uuid.uuid4, nullable=False, index=True)
 
     device = relationship("Device", back_populates="device_credential")
 
     created_at = Column(DateTime(), default=datetime.datetime.now)
-    updated_at = Column(DateTime(), onupdate=datetime.datetime.now)
+    updated_at = Column(DateTime(), onupdate=datetime.datetime.now, default=datetime.datetime.now)
+
+    def __repr__(self) -> str:
+        return f'{self.id} [{self.credentials_type}] access_token={self.credentials_id}:{self.credentials_value}'
 
 
 '''CREATE TABLE IF NOT EXISTS device_credentials (

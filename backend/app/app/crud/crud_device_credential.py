@@ -1,5 +1,4 @@
 from typing import Any, Dict, Optional, Union
-from app.models import device_credential
 
 from sqlalchemy.orm import Session
 
@@ -14,6 +13,7 @@ class CRUDDeviceCredential(CRUDBase[DeviceCredential, DeviceCredentialCreate, De
 
     def create(self, db: Session, *, obj_in: DeviceCredentialCreate) -> DeviceCredential:
         db_obj = DeviceCredential(
+            id=obj_in.id,
             credentials_id=obj_in.credentials_id,
             credentials_type=obj_in.credentials_type,
             credentials_value=obj_in.credentials_value,

@@ -1,18 +1,16 @@
 from datetime import datetime
 from typing import Optional
 import uuid
-from pydantic import BaseModel, UUID4
+from pydantic import BaseModel
 
 
 # Shared properties
 class DeviceCredentialBase(BaseModel):
-    credentials_id: str
-    credentials_type: str
-    credentials_value: Optional[str] = 'unknwon'
-    device_id: Optional[UUID4] = uuid.uuid4()
-
-    created_at: datetime
-    updated_at: datetime
+    id: uuid.UUID
+    credentials_id: Optional[str]
+    credentials_type: Optional[str]
+    credentials_value: Optional[str]
+    device_id: Optional[uuid.UUID]
 
 
 # Properties to receive via API on creation
@@ -26,7 +24,7 @@ class DeviceCredentialUpdate(DeviceCredentialBase):
 
 
 class DeviceCredentialInDBBase(DeviceCredentialBase):
-    id: Optional[UUID4] = None
+    id: uuid.UUID
 
     class Config:
         orm_mode = True
@@ -34,7 +32,8 @@ class DeviceCredentialInDBBase(DeviceCredentialBase):
 
 # Additional properties to return via API
 class DeviceCredential(DeviceCredentialInDBBase):
-    pass
+    created_at: datetime = datetime.now()
+    updated_at: datetime = datetime.now()
 
 
 # Additional properties stored in DB
