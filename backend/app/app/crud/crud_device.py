@@ -33,7 +33,6 @@ class CRUDDevice(CRUDBase[Device, DeviceCreate, DeviceUpdate]):
             device_id=db_obj.id
         )
         crud_device_credential.device_credential.create(db=db, obj_in=dc_obj)
-        print(db_obj.device_credential)
         return db_obj
 
     def update(
