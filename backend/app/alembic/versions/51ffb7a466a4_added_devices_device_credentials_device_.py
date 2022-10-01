@@ -1,8 +1,8 @@
 """Added devices, device_credentials, device_profiles
 
-Revision ID: 279a75e1702d
+Revision ID: 51ffb7a466a4
 Revises: d4867f3a4c0a
-Create Date: 2022-09-28 09:18:35.696193
+Create Date: 2022-10-01 10:38:45.811822
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '279a75e1702d'
+revision = '51ffb7a466a4'
 down_revision = 'd4867f3a4c0a'
 branch_labels = None
 depends_on = None
@@ -32,7 +32,6 @@ def upgrade():
     sa.Column('default_dashboard_id', postgresql.UUID(as_uuid=True), nullable=False),
     sa.Column('default_queue_name', sa.String(), nullable=True),
     sa.Column('provision_device_key', sa.String(), nullable=True),
-    sa.Column('external_id', postgresql.UUID(as_uuid=True), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
@@ -48,14 +47,13 @@ def upgrade():
     sa.Column('device_profile_id', postgresql.UUID(as_uuid=True), nullable=True),
     sa.Column('customer_id', postgresql.UUID(as_uuid=True), nullable=True),
     sa.Column('tenant_id', postgresql.UUID(as_uuid=True), nullable=True),
-    sa.Column('external_id', postgresql.UUID(as_uuid=True), nullable=True),
     sa.Column('firmware_id', postgresql.UUID(as_uuid=True), nullable=True),
     sa.Column('software_id', postgresql.UUID(as_uuid=True), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['device_profile_id'], ['device_profiles.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('tenant_id', 'external_id'),
+    sa.UniqueConstraint('tenant_id', 'id'),
     sa.UniqueConstraint('tenant_id', 'name')
     )
     op.create_index(op.f('ix_devices_device_profile_id'), 'devices', ['device_profile_id'], unique=False)
@@ -63,13 +61,15 @@ def upgrade():
     sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
     sa.Column('credentials_id', sa.String(), nullable=False),
     sa.Column('credentials_type', sa.String(), nullable=False),
-    sa.Column('credentials_value', sa.String(), nullable=True),
+    sa.Column('credentials_value', sa.String(), nullable=False),
     sa.Column('device_id', postgresql.UUID(as_uuid=True), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['device_id'], ['devices.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_index(op.f('ix_device_credentials_credentials_id'), 'device_credentials', ['credentials_id'], unique=False)
+    op.create_index(op.f('ix_device_credentials_credentials_value'), 'device_credentials', ['credentials_value'], unique=False)
     op.create_index(op.f('ix_device_credentials_device_id'), 'device_credentials', ['device_id'], unique=False)
     op.drop_index('ix_item_description', table_name='item')
     op.drop_index('ix_item_id', table_name='item')
@@ -92,6 +92,8 @@ def downgrade():
     op.create_index('ix_item_id', 'item', ['id'], unique=False)
     op.create_index('ix_item_description', 'item', ['description'], unique=False)
     op.drop_index(op.f('ix_device_credentials_device_id'), table_name='device_credentials')
+    op.drop_index(op.f('ix_device_credentials_credentials_value'), table_name='device_credentials')
+    op.drop_index(op.f('ix_device_credentials_credentials_id'), table_name='device_credentials')
     op.drop_table('device_credentials')
     op.drop_index(op.f('ix_devices_device_profile_id'), table_name='devices')
     op.drop_table('devices')
