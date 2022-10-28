@@ -43,6 +43,7 @@ class Settings(BaseSettings):
     MONGO_SETTING_URI: MongoDsn = None
 
     REDIS_URI: RedisDsn = None
+    REDIS_LOGSTASH_URI: RedisDsn = None
 
     @validator("SQLALCHEMY_DATABASE_URI", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:

@@ -22,6 +22,7 @@ async def ingest_system_log(
     Ingest System Log.
     """
     obj = await crud.add_log_to_mongo(collection=collection, obj_in=obj_in, device_credential=device_credential)
+    await crud.add_to_redis_for_logstash(obj_in=obj_in, device_credential=device_credential)
     return obj_in
 
 
