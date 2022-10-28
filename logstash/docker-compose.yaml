@@ -1,0 +1,15 @@
+version: '3.3'
+
+services:
+  logstash:
+    build:
+      context: ./
+    ports:
+      - "9600:9600"
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+      REDIS_LOGSTASH_HOST: 'redis'
+      REDIS_LOGSTASH_PORT: 6379
+      REDIS_LOGSTASH_DB: 5
+      ELASTIC_LOGSTASH_HOST: 'elasticsearch:9200'
+
